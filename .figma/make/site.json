@@ -1,0 +1,10 @@
+{
+  "description": "Showcase your skills and projects with a visually stunning, interactive portfolio designed for computer science students, featuring responsive layouts and engaging animations.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
