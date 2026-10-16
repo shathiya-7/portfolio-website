@@ -549,7 +549,10 @@ export default function App() {
             <div className="portrait-frame" ref={portraitRef}>
               <div className="portrait-cross cross-one">+</div>
               <div className="portrait-cross cross-two">+</div>
-              <img src="/assets/shathiya-portrait.jpeg" alt="Shathiya K." />
+              <img
+                src={`${import.meta.env.BASE_URL}assets/shathiya-portrait.jpeg`}
+                alt="Shathiya K."
+              />
               <div className="portrait-glow" />
               <div className="portrait-meta">
                 <span>SUBJECT / SK</span>
