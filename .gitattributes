@@ -147,3 +147,6 @@
 
 # Keep the deployed portrait as a regular Git blob so Vercel receives the JPEG itself.
 public/assets/shathiya-portrait.jpeg -filter -diff -merge -text
+public/assets/ecsoc.png -filter -diff -merge -text
+public/assets/shefi.jpg -filter -diff -merge -text
+public/assets/gwy-acceptance-shathiya-k.png -filter -diff -merge -text
