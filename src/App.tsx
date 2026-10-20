@@ -449,7 +449,7 @@ export default function App() {
   }
 
   const copyEmail = async () => {
-    await navigator.clipboard.writeText("kannanshathiya@gmail.com")
+    await navigator.clipboard.writeText("kannanshathiya7@gmail.com")
     setCopied(true)
     window.setTimeout(() => setCopied(false), 1800)
   }
@@ -465,7 +465,7 @@ export default function App() {
     const composeParams = new URLSearchParams({
       view: "cm",
       fs: "1",
-      to: "kannanshathiya@gmail.com",
+      to: "kannanshathiya7@gmail.com",
       su: subject,
       body,
     })
@@ -816,7 +816,7 @@ export default function App() {
               <button className="copy-email" onClick={copyEmail}>
                 <span>
                   <Mail size={16} />
-                  kannanshathiya@gmail.com
+                  kannanshathiya7@gmail.com
                 </span>
                 {copied ? <Check size={17} /> : <Copy size={17} />}
               </button>
