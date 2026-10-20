@@ -1,11 +1,10 @@
-import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react"
+import { FormEvent, MouseEvent, useEffect, useRef, useState } from "react"
 import { motion, useReducedMotion } from "motion/react"
 import {
   ArrowDown,
   ArrowUpRight,
   Check,
   Copy,
-  ImagePlus,
   Mail,
   Menu,
   Moon,
@@ -79,14 +78,14 @@ const timelineItems = [
     text: "Applied security practices · Vulnerability assessment · Hands-on cybersecurity workflows",
   },
   {
-    date: "2025 — PRESENT",
+    date: "2026 — PRESENT",
     type: "Leadership",
     meta: "IIITDM KANCHEEPURAM",
     title: "Coordinator, Developers Club",
-    text: "Community building · Technical collaboration · Peer learning",
+    text: "DevOps · Open source · Community building ",
   },
   {
-    date: "2025 — PRESENT",
+    date: "2026 — PRESENT",
     type: "Leadership",
     meta: "IIITDM KANCHEEPURAM",
     title: "Coordinator, Cybersecurity Club",
@@ -97,28 +96,14 @@ const timelineItems = [
     type: "Education",
     meta: "IIITDM KANCHEEPURAM",
     title: "B.Tech, Computer Science & Engineering",
-    text: "Undergraduate study in computing, systems, and engineering design",
+    text: "2nd year Undergraduate student",
   },
   {
     date: "2025",
-    type: "Milestone",
-    meta: "JEE MAIN",
-    title: "98 Percentile",
-    text: "National engineering entrance examination",
-  },
-  {
-    date: "2025",
-    type: "Education",
-    meta: "CLASS XII",
-    title: "95.6%",
-    text: "Senior secondary education",
-  },
-  {
-    date: "2023",
-    type: "Education",
-    meta: "CLASS X",
-    title: "97.6%",
-    text: "Secondary education",
+    type: "Schooling",
+    meta: "SECONDARY & SENIOR SECONDARY EDUCATION",
+    title: "JEE Main: 98 Percentile",
+    text: "CBSE: Class XII- 95.6% , Class X- 97.6%",
   },
 ]
 
@@ -127,16 +112,22 @@ const publicWork = [
     label: "ECSoC",
     title: "Open-Source Contributor",
     text: "Contributing, collaborating, and learning in public through real open-source work.",
+    image: "assets/ecsoc.png",
+    imageAlt: "ECSoC Elite Coders Summer of Code contributor badge",
   },
   {
     label: "SHEFI",
     title: "Season 17 Scholar",
     text: "Awarded a full scholarship to learn alongside a global community exploring Web3.",
+    image: "assets/shefi.jpg",
+    imageAlt: "You Can Do It with SheFi Season Seventeen artwork",
   },
   {
     label: "GIRLS WHO YAP",
     title: "GWY Fellowship 2.0",
     text: "Growing through a cohort built around ideas, expression, and community.",
+    image: "assets/gwy-acceptance-shathiya-k.png",
+    imageAlt: "Girls Who Yap Fellowship 2.0 acceptance artwork",
   },
 ]
 
@@ -288,65 +279,14 @@ function ProjectVisual({ type }: { type: string }) {
   )
 }
 
-function UploadSlot({ label }: { label: string }) {
-  const [preview, setPreview] = useState("")
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(
-    () => () => {
-      if (preview) URL.revokeObjectURL(preview)
-    },
-    [preview],
-  )
-
-  const selectImage = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-    setPreview((current) => {
-      if (current) URL.revokeObjectURL(current)
-      return URL.createObjectURL(file)
-    })
-  }
-
-  return (
-    <label
-      className={`upload-slot ${preview ? "has-image" : ""}`}
-      tabIndex={0}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault()
-          inputRef.current?.click()
-        }
-      }}
-      aria-label={`${preview ? "Replace" : "Upload"} image for ${label}`}
-    >
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        onChange={selectImage}
-        tabIndex={-1}
-      />
-      {preview ? (
-        <img src={preview} alt={`Selected visual for ${label}`} />
-      ) : (
-        <span>
-          <ImagePlus size={20} strokeWidth={1.5} />
-          <b>ADD IMAGE</b>
-          <small>JPG, PNG OR WEBP</small>
-        </span>
-      )}
-      <i>{preview ? "REPLACE IMAGE" : "VISUAL SLOT"}</i>
-    </label>
-  )
-}
-
 function InteractiveCursor() {
   const dotRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (window.matchMedia("(pointer: coarse)").matches) return
+
+    let activeSection: HTMLElement | null = null
 
     const move = (event: globalThis.MouseEvent) => {
       dotRef.current?.style.setProperty(
@@ -377,20 +317,49 @@ function InteractiveCursor() {
       dotRef.current?.classList.remove("is-visible")
       ringRef.current?.classList.remove("is-visible")
     }
+    const moveSectionGlow = (event: PointerEvent) => {
+      const target = event.target as HTMLElement
+      const section = target.closest<HTMLElement>(".section, .hero")
+      if (activeSection && activeSection !== section) {
+        activeSection.style.removeProperty("--section-cursor-x")
+        activeSection.style.removeProperty("--section-cursor-y")
+      }
+      activeSection = section
+      if (!section) return
+
+      const bounds = section.getBoundingClientRect()
+      section.style.setProperty(
+        "--section-cursor-x",
+        `${event.clientX - bounds.left}px`,
+      )
+      section.style.setProperty(
+        "--section-cursor-y",
+        `${event.clientY - bounds.top}px`,
+      )
+    }
+    const clearSectionGlow = () => {
+      activeSection?.style.removeProperty("--section-cursor-x")
+      activeSection?.style.removeProperty("--section-cursor-y")
+      activeSection = null
+    }
 
     window.addEventListener("mousemove", move, { passive: true })
+    window.addEventListener("pointermove", moveSectionGlow, { passive: true })
     document.addEventListener("mouseover", hover, { passive: true })
     window.addEventListener("mousedown", press)
     window.addEventListener("mouseup", release)
     document.documentElement.addEventListener("mouseenter", enter)
     document.documentElement.addEventListener("mouseleave", leave)
+    document.documentElement.addEventListener("pointerleave", clearSectionGlow)
     return () => {
       window.removeEventListener("mousemove", move)
+      window.removeEventListener("pointermove", moveSectionGlow)
       document.removeEventListener("mouseover", hover)
       window.removeEventListener("mousedown", press)
       window.removeEventListener("mouseup", release)
       document.documentElement.removeEventListener("mouseenter", enter)
       document.documentElement.removeEventListener("mouseleave", leave)
+      document.documentElement.removeEventListener("pointerleave", clearSectionGlow)
     }
   }, [])
 
@@ -403,10 +372,12 @@ function InteractiveCursor() {
 }
 
 export default function App() {
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0)
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [contactStatus, setContactStatus] = useState("")
   const headingRef = useRef<HTMLHeadingElement>(null)
   const portraitRef = useRef<HTMLDivElement>(null)
   const frameRef = useRef<number | null>(null)
@@ -483,10 +454,37 @@ export default function App() {
     window.setTimeout(() => setCopied(false), 1800)
   }
 
+  const submitContactForm = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const name = String(formData.get("name") ?? "")
+    const email = String(formData.get("email") ?? "")
+    const subject = String(formData.get("subject") ?? "")
+    const message = String(formData.get("message") ?? "")
+    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`
+    const composeParams = new URLSearchParams({
+      view: "cm",
+      fs: "1",
+      to: "kannanshathiya@gmail.com",
+      su: subject,
+      body,
+    })
+    const composeUrl = `https://mail.google.com/mail/?${composeParams.toString()}`
+    const composeWindow = window.open(composeUrl, "_blank")
+
+    if (!composeWindow) {
+      window.location.assign(composeUrl)
+      return
+    }
+
+    composeWindow.opener = null
+    setContactStatus("Gmail compose opened with your message ready to send.")
+  }
+
   const navItems = [
     ["About", "#intro"],
     ["Projects", "#projects"],
-    ["Cyber Lab", "#skills"],
+    ["Toolbox", "#skills"],
     ["Experience", "#experience"],
     ["Contact", "#contact"],
   ]
@@ -496,7 +494,7 @@ export default function App() {
       <InteractiveCursor />
       <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
         <a className="monogram" href="#intro" aria-label="Shathiya K. home">
-          SK<span>.</span>
+          Sha<span>.</span>
         </a>
         <nav className={menuOpen ? "open" : ""} aria-label="Primary navigation">
           {navItems.map(([label, href]) => (
@@ -555,7 +553,7 @@ export default function App() {
               />
               <div className="portrait-glow" />
               <div className="portrait-meta">
-                <span>SUBJECT / SK</span>
+                <span>SUBJECT / Sha</span>
                 <span>FRAME / 001</span>
               </div>
             </div>
@@ -663,28 +661,50 @@ export default function App() {
             title="THINGS I'VE BUILT."
           />
           <div className="projects-list">
-            {projects.map((project, index) => (
-              <motion.article
-                className="project-card"
-                key={project.title}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: index * 0.06 }}
-              >
-                <div className="project-copy">
-                  <span className="project-number">
-                    PROJECT / {project.number}
-                  </span>
-                  <h3>{project.title}</h3>
-                  <p>{project.description}</p>
-                  <div className="tag-list">
-                    {project.tags.map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
-                  </div>
+            <div
+              className="project-index"
+              role="tablist"
+              aria-label="Projects"
+            >
+              {projects.map((project, index) => (
+                <button
+                  className={`project-index-item ${activeProjectIndex === index ? "active" : ""}`}
+                  id={`project-tab-${index}`}
+                  key={project.title}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeProjectIndex === index}
+                  aria-controls="project-details"
+                  onClick={() => setActiveProjectIndex(index)}
+                >
+                  <span>{project.number}</span>
+                  {project.title}
+                  <ArrowUpRight size={16} />
+                </button>
+              ))}
+            </div>
+            <motion.article
+              className="project-card active-project-card"
+              key={projects[activeProjectIndex].title}
+              id="project-details"
+              role="tabpanel"
+              aria-labelledby={`project-tab-${activeProjectIndex}`}
+              {...reveal}
+            >
+              <div className="project-copy">
+                <span className="project-number">
+                  PROJECT / {projects[activeProjectIndex].number}
+                </span>
+                <h3>{projects[activeProjectIndex].title}</h3>
+                <p>{projects[activeProjectIndex].description}</p>
+                <div className="tag-list">
+                  {projects[activeProjectIndex].tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
                 </div>
-                <ProjectVisual type={project.visual} />
-              </motion.article>
-            ))}
+              </div>
+              <ProjectVisual type={projects[activeProjectIndex].visual} />
+            </motion.article>
           </div>
         </section>
 
@@ -735,18 +755,17 @@ export default function App() {
             title="THE PATH SO FAR."
           />
           <div className="timeline">
-            {timelineItems.map((item, index) => (
+            {timelineItems.map((item) => (
               <motion.div className="timeline-row" key={item.title} {...reveal}>
-                <span className="timeline-index">0{index + 1}</span>
                 <div className="timeline-meta">
                   <span>{item.date}</span>
                   <i>{item.type}</i>
                 </div>
-                <div>
+                <div className="timeline-content">
                   <small>{item.meta}</small>
                   <h3>{item.title}</h3>
+                  <p>{item.text}</p>
                 </div>
-                <p>{item.text}</p>
               </motion.div>
             ))}
           </div>
@@ -766,7 +785,11 @@ export default function App() {
                 {...reveal}
                 transition={{ ...reveal.transition, delay: index * 0.08 }}
               >
-                <UploadSlot label={item.label} />
+                <img
+                  className="public-image"
+                  src={`${import.meta.env.BASE_URL}${item.image}`}
+                  alt={item.imageAlt}
+                />
                 <span>
                   0{index + 1} / {item.label}
                 </span>
@@ -814,7 +837,7 @@ export default function App() {
                 </a>
               </div>
             </motion.div>
-            <motion.form {...reveal}>
+            <motion.form {...reveal} onSubmit={submitContactForm}>
               <div className="field-row">
                 <label>
                   <span>Your name</span>
@@ -848,6 +871,12 @@ export default function App() {
                   required
                 />
               </label>
+              <button className="contact-submit" type="submit">
+                Open Gmail compose <ArrowUpRight size={15} />
+              </button>
+              <p className="contact-status" role="status" aria-live="polite">
+                {contactStatus}
+              </p>
             </motion.form>
           </div>
         </section>
@@ -855,9 +884,9 @@ export default function App() {
 
       <footer>
         <a className="monogram" href="#intro">
-          SK<span>.</span>
+          Sha<span>.</span>
         </a>
-        <p>Designed & built by Shathiya K. / 2025</p>
+        <p>Designed & built by Shathiya K. / 2026</p>
         <a href="#intro">
           Back to top <ArrowUpRight size={14} />
         </a>
